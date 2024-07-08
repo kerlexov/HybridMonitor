@@ -1,0 +1,30 @@
+groups:
+- name: service_rules
+  rules:
+
+  - alert: service_down
+    expr: up == 0
+    for: 2m
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+
+  - alert: sensor_down
+    expr: redfish_exporter_SensorHealth == 0
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      summary: "Temperature sensor {{ $labels.sensor }} is not working"
+      description: "{{ $labels.sensor }} on host {{ $labels.host }} is not working."
+
+  - alert: fan_down
+    expr: redfish_exporter_FanStatus == 0
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      summary: "Fan sensor {{ $labels.fan }} is not working"
+      description: "{{ $labels.fan }} on host {{ $labels.host }} is not working."

@@ -1,0 +1,16 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: 'mail'
+  repeat_interval: 4h
+  group_by: [ alertname ]
+
+receivers:
+  - name: 'mail'
+    email_configs:
+      - smarthost: 'smtp-mail.outlook.com:587'
+        auth_username: 'test@racunarstvo.hr'
+        auth_password: "Pa$$w0rd"
+        from: 'test@racunarstvo.hr'
+        to: 'test@racunarstvo.hr'
