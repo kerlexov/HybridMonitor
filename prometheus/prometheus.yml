@@ -22,13 +22,13 @@ scrape_configs:
     scrape_interval: 5s
     metrics_path: /redfish
     static_configs:
-      - targets: [ '192.168.199.239:9141' ]
+      - targets: [ '192.168.64.1:9141' ]
 
   - job_name: 'vsphere-exporter'
     scrape_interval: 5s
     metrics_path: /vsphere
     static_configs:
-      - targets: [ '192.168.199.239:9142' ]
+      - targets: [ '192.168.64.1:9142' ]
 
   - job_name: 'prometheus'
     scrape_interval: 5s

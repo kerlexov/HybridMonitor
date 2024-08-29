@@ -165,23 +165,30 @@ func (re *VsphereManager) UpdateMetrics(values []*VsphereData, ch chan<- prometh
 			ch <- prometheus.MustNewConstMetric(overallStatus, prometheus.GaugeValue, parseStatus(data.OverallStatus), data.VSphereServerIp, data.HostIp)
 			ch <- prometheus.MustNewConstMetric(runTime, prometheus.GaugeValue, parseRunTime(data.BootTime), data.VSphereServerIp, data.HostIp)
 
-			for _, info := range data.HealthSystem.SystemHealthInfo.NumericSensorInfo {
-				ch <- prometheus.MustNewConstMetric(sensorInfo, prometheus.GaugeValue, float64(info.CurrentReading), data.VSphereServerIp,
-					data.HostIp, info.Name, strconv.Itoa(int(info.UnitModifier)), info.BaseUnits, info.RateUnits, info.SensorType,
-					info.HealthState.GetElementDescription().Summary, info.HealthState.GetElementDescription().Key)
+			if data.HealthSystem.SystemHealthInfo.NumericSensorInfo != nil {
+				for _, info := range data.HealthSystem.SystemHealthInfo.NumericSensorInfo {
+					ch <- prometheus.MustNewConstMetric(sensorInfo, prometheus.GaugeValue, float64(info.CurrentReading), data.VSphereServerIp,
+						data.HostIp, info.Name, strconv.Itoa(int(info.UnitModifier)), info.BaseUnits, info.RateUnits, info.SensorType,
+						info.HealthState.GetElementDescription().Summary, info.HealthState.GetElementDescription().Key)
+				}
 			}
 
-			for _, info := range data.HealthSystem.HardwareStatusInfo.CpuStatusInfo {
-				ch <- prometheus.MustNewConstMetric(hardwareInfo, prometheus.GaugeValue,
-					parseStatus(info.GetHostHardwareElementInfo().Status.GetElementDescription().Key),
-					data.VSphereServerIp, data.HostIp, info.GetHostHardwareElementInfo().Name,
-					info.GetHostHardwareElementInfo().Status.GetElementDescription().Summary)
+			if data.HealthSystem.HardwareStatusInfo.CpuStatusInfo != nil {
+				for _, info := range data.HealthSystem.HardwareStatusInfo.CpuStatusInfo {
+					ch <- prometheus.MustNewConstMetric(hardwareInfo, prometheus.GaugeValue,
+						parseStatus(info.GetHostHardwareElementInfo().Status.GetElementDescription().Key),
+						data.VSphereServerIp, data.HostIp, info.GetHostHardwareElementInfo().Name,
+						info.GetHostHardwareElementInfo().Status.GetElementDescription().Summary)
+				}
 			}
-			for _, info := range data.HealthSystem.HardwareStatusInfo.MemoryStatusInfo {
-				ch <- prometheus.MustNewConstMetric(hardwareInfo, prometheus.GaugeValue,
-					parseStatus(info.GetHostHardwareElementInfo().Status.GetElementDescription().Key),
-					data.VSphereServerIp, data.HostIp, info.GetHostHardwareElementInfo().Name,
-					info.GetHostHardwareElementInfo().Status.GetElementDescription().Summary)
+
+			if data.HealthSystem.HardwareStatusInfo.MemoryStatusInfo != nil {
+				for _, info := range data.HealthSystem.HardwareStatusInfo.MemoryStatusInfo {
+					ch <- prometheus.MustNewConstMetric(hardwareInfo, prometheus.GaugeValue,
+						parseStatus(info.GetHostHardwareElementInfo().Status.GetElementDescription().Key),
+						data.VSphereServerIp, data.HostIp, info.GetHostHardwareElementInfo().Name,
+						info.GetHostHardwareElementInfo().Status.GetElementDescription().Summary)
+				}
 			}
 
 			log.Println(fmt.Sprintf("Endpoint: %s (%s)scraped", data.HostIp, data.HostManager))

@@ -4,10 +4,10 @@ go 1.17
 
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/kerlexov/HybridMonitor/backend/redfish_exporter v0.0.0-20240708012235-7e2919355d05
+	github.com/kerlexov/HybridMonitor/backend/vsphere_exporter v0.0.0-20240708012235-7e2919355d05
 	github.com/labstack/echo/v4 v4.6.3
 	github.com/labstack/gommon v0.3.1
-	github.com/kerlexov/HybridMonitor/backend/redfish_exporter v0.0.0-20220320182005-3a7b57797a9b
-	github.com/kerlexov/HybridMonitor/backend/vsphere_exporter v0.0.0-20220320182005-3a7b57797a9b
 	gorm.io/driver/postgres v1.2.3
 	gorm.io/gorm v1.22.5
 )
@@ -37,9 +37,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	github.com/vmware/govmomi v0.27.2 // indirect
-	go.uber.org/atomic v1.9.0 // indirect
-	go.uber.org/multierr v1.7.0 // indirect
-	go.uber.org/zap v1.20.0 // indirect
 	golang.org/x/crypto v0.0.0-20220128200615-198e4374d7ed // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sys v0.0.0-20220128215802-99c3d69c2c27 // indirect
