@@ -165,7 +165,7 @@ func (re *VsphereManager) UpdateMetrics(values []*VsphereData, ch chan<- prometh
 			ch <- prometheus.MustNewConstMetric(overallStatus, prometheus.GaugeValue, parseStatus(data.OverallStatus), data.VSphereServerIp, data.HostIp)
 			ch <- prometheus.MustNewConstMetric(runTime, prometheus.GaugeValue, parseRunTime(data.BootTime), data.VSphereServerIp, data.HostIp)
 
-			if data.HealthSystem.SystemHealthInfo.NumericSensorInfo != nil {
+			if data.HealthSystem.SystemHealthInfo != nil && data.HealthSystem.SystemHealthInfo.NumericSensorInfo != nil {
 				for _, info := range data.HealthSystem.SystemHealthInfo.NumericSensorInfo {
 					ch <- prometheus.MustNewConstMetric(sensorInfo, prometheus.GaugeValue, float64(info.CurrentReading), data.VSphereServerIp,
 						data.HostIp, info.Name, strconv.Itoa(int(info.UnitModifier)), info.BaseUnits, info.RateUnits, info.SensorType,
@@ -173,7 +173,7 @@ func (re *VsphereManager) UpdateMetrics(values []*VsphereData, ch chan<- prometh
 				}
 			}
 
-			if data.HealthSystem.HardwareStatusInfo.CpuStatusInfo != nil {
+			if data.HealthSystem.HardwareStatusInfo != nil && data.HealthSystem.HardwareStatusInfo.CpuStatusInfo != nil {
 				for _, info := range data.HealthSystem.HardwareStatusInfo.CpuStatusInfo {
 					ch <- prometheus.MustNewConstMetric(hardwareInfo, prometheus.GaugeValue,
 						parseStatus(info.GetHostHardwareElementInfo().Status.GetElementDescription().Key),
@@ -182,7 +182,7 @@ func (re *VsphereManager) UpdateMetrics(values []*VsphereData, ch chan<- prometh
 				}
 			}
 
-			if data.HealthSystem.HardwareStatusInfo.MemoryStatusInfo != nil {
+			if data.HealthSystem.HardwareStatusInfo != nil && data.HealthSystem.HardwareStatusInfo.MemoryStatusInfo != nil {
 				for _, info := range data.HealthSystem.HardwareStatusInfo.MemoryStatusInfo {
 					ch <- prometheus.MustNewConstMetric(hardwareInfo, prometheus.GaugeValue,
 						parseStatus(info.GetHostHardwareElementInfo().Status.GetElementDescription().Key),
