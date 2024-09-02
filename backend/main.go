@@ -13,8 +13,8 @@ import (
 )
 
 func main() {
-	router := router.New()
-	db, err := db.Init(db.DbConfig{
+	rout := router.New()
+	dbConn, err := db.Init(db.DbConfig{
 		Host:     "localhost",
 		Username: "test",
 		Password: "YqelfkqoivjffuFđ",
@@ -24,31 +24,56 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.AutoMigrate(&models.User{}, &models.RedfishHost{}, &models.VsphereHost{})
-
-	redfish_exporter := redfish_exporter.NewRedfishExporter(9141, "/redfish", router.Logger)
-	if redfish_exporter == nil {
-		router.Logger.Error("Cannot start redfish exporter")
-	} else {
-		go redfish_exporter.Start()
-	}
-	vsphere_exporter := vsphere_exporter.NewVsphereExporter(9142, "/vsphere", router.Logger)
-	if vsphere_exporter == nil {
-		router.Logger.Error("Cannot start vsphere exporter")
-	} else {
-		go vsphere_exporter.Start()
+	err = dbConn.AutoMigrate(&models.User{}, &models.RedfishHost{}, &models.VsphereHost{})
+	if err != nil {
+		rout.Logger.Error("Cannot start redfish exporter")
 	}
 
-	handler := handler.NewHandler(db, redfish_exporter, vsphere_exporter)
-	defer handler.Close()
-	api := router.Group("/api")
-	handler.Register(api)
-	db.Create(&models.User{Username: "user", Password: "test"})
-	router.Logger.Fatal(router.StartServer(&http.Server{
+	redfishExporter := redfish_exporter.NewRedfishExporter(9141, "/redfish", rout.Logger)
+	if redfishExporter == nil {
+		rout.Logger.Error("Cannot start no redfish exporter")
+	} else {
+		go func() {
+			err := redfishExporter.Start()
+			if err != nil {
+				rout.Logger.Error("Cannot start redfish exporter")
+			}
+		}()
+	}
+	vsphereExporter := vsphere_exporter.NewVsphereExporter(9142, "/vsphere", rout.Logger)
+	if vsphereExporter == nil {
+		rout.Logger.Error("Cannot start vsphere exporter")
+	} else {
+		go func() {
+			err := vsphereExporter.Start()
+			if err != nil {
+				rout.Logger.Error("Cannot start vsphere exporter")
+			}
+		}()
+	}
+
+	handl := handler.NewHandler(dbConn, redfishExporter, vsphereExporter)
+	defer handl.Close()
+	api := rout.Group("/api")
+	handl.Register(api)
+	dbConn.Create(&models.User{Username: "user", Password: "test"})
+	rout.Logger.Fatal(rout.StartServer(&http.Server{
 		Addr:         ":9393",
 		ReadTimeout:  20 * time.Minute,
 		WriteTimeout: 20 * time.Minute,
 	}))
-	defer redfish_exporter.Logout()
-	defer vsphere_exporter.Logout()
+	defer func(redfish_exporter *redfish_exporter.RedfishExporter) {
+		err := redfish_exporter.Logout()
+		if err != nil {
+			rout.Logger.Error("Cannot logout redfish exporter")
+
+		}
+	}(redfishExporter)
+	defer func(vsphereExporter *vsphere_exporter.VsphereExporter) {
+		err := vsphereExporter.Logout()
+		if err != nil {
+			rout.Logger.Error("Cannot logout vsphere exporter")
+
+		}
+	}(vsphereExporter)
 }
