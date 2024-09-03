@@ -6,25 +6,38 @@ networks:
 volumes:
   prometheus_data: {}
   grafana_data: {}
+  apivol: {}
 
 services:
+  api:
+    container_name: api
+    build: ./backend
+    ports:
+      - 9393:9393
+    restart: on-failure
+    volumes:
+      - apivol:/usr/src/app/
+    depends_on:
+      - postgres
+    networks:
+      - internal
 
-#  postgres:
-#    image: postgres:11.4-alpine
-#    container_name: postgres
-#    volumes:
-#      - ./psql/:/docker-entrypoint-initdb.d
-#    environment:
-#      POSTGRES_MULTIPLE_DATABASES: "backend"
-#      POSTGRES_USER: test
-#      POSTGRES_PASSWORD: YqelfkqoivjffuFđ
-#      POSTGRES_HOST: 0.0.0.0
-#      POSTRES_PORT: 5432
-#    restart: always
-#    networks:
-#      - internal
-#    ports:
-#      - "5432:5432"
+  postgres:
+    image: postgres:11.4-alpine
+    container_name: postgres
+    volumes:
+      - ./psql/:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: "backend"
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: YqelfkqoivjffuFđ
+      POSTGRES_HOST: 0.0.0.0
+      POSTRES_PORT: 5432
+    restart: always
+    networks:
+      - internal
+    ports:
+      - "5432:5432"
 
   prometheus:
     image: prom/prometheus
@@ -66,8 +79,8 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/:/etc/grafana/provisioning/
-#    env_file:
-#      - ./grafana/config.monitoring
+    #    env_file:
+    #      - ./grafana/config.monitoring
     networks:
       - internal
     ports:
