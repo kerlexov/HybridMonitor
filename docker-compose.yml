@@ -13,7 +13,9 @@ services:
     container_name: api
     build: ./backend
     ports:
-      - 9393:9393
+      - "9393:9393"
+      - "9141:9141"
+      - "9142:9142"
     restart: on-failure
     volumes:
       - apivol:/usr/src/app/
